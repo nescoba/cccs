@@ -1,7 +1,3 @@
-library(survey)
-library(stargazer)
-library(candisc)
-
 #' Computes Canonical correlation p-values from regression coefficients
 #'
 #' @param data A data frame containing the variables to be used in the canonical correlation analysis
@@ -15,6 +11,7 @@ library(candisc)
 #' @param howmany Number of canonical correlations to be computed
 #'
 #' @return A data frame with the p-values for the canonical correlations
+#' @export
 
 csdcanon <- function(data, vars1, vars2, finwgt, n_cc, rawcoef_var1, rawcoef_var2, howmany = NA) {
   # determine which of vars1 and vars2 is the longest
@@ -56,7 +53,7 @@ csdcanon <- function(data, vars1, vars2, finwgt, n_cc, rawcoef_var1, rawcoef_var
   # calculate weightindex and set survey design using svydesign function from survey package
   weightindex <- (2 * n_cc) + 1
 
-  des <- svydesign(weights = OGStataUVW[[weightindex]], ids = ~1, data = OGStataUVW)
+  des <- survey::svydesign(weights = OGStataUVW[[weightindex]], ids = ~1, data = OGStataUVW)
 
   names_OGStataUVW <- names(OGStataUVW)
   # loop through 1 to n_cc
@@ -64,7 +61,7 @@ csdcanon <- function(data, vars1, vars2, finwgt, n_cc, rawcoef_var1, rawcoef_var
     secondindex <- i + n_cc
     formula_str_1 <- paste(names_OGStataUVW[i], "~", names_OGStataUVW[secondindex])
     # run svyglm function from survey package
-    model1 <- svyglm(as.formula(formula_str_1), design = des)
+    model1 <- survey::svyglm(as.formula(formula_str_1), design = des)
     # save coefficients to Results matrix
     aux <- summary(model1)$coefficients[, 1]
     Results[(8 * (i - 1)) + 7, 1] <- aux[1]
